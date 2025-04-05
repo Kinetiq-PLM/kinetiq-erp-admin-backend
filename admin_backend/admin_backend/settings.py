@@ -41,8 +41,14 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",    
     "django_cognito_jwt",
+    'widget_tweaks',
 
     "user_manage",
+    "item_master_list",
+    "business_partner_master_list",
+    "warehouse",
+    "policies",
+    "currency",
 ]
 
 MIDDLEWARE = [
@@ -87,6 +93,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'admin_backend.wsgi.application'
 
+AWS_COGNITO_SETTINGS = {
+    'REGION': 'us-east-1',  # Your AWS region
+    'USER_POOL_ID': 'us-east-1_xxxxxxxx',  # Your User Pool ID
+    'APP_CLIENT_ID': 'your-app-client-id',  # Your App Client ID
+    'APP_CLIENT_SECRET': 'your-app-client-secret',  # Your App Client Secret (if applicable)
+    'DOMAIN': 'your-domain.auth.us-east-1.amazoncognito.com',  # Your Cognito domain
+    'REDIRECT_URI': 'https://your-domain.com/auth/callback/',  # Callback URL after authentication
+}
 
 
 # Database

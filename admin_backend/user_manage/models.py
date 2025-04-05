@@ -6,12 +6,10 @@ from django import forms
 
 class RolePermission(models.Model):
     FULL_ACCESS = 'Full Access'
-    LIMITED_ACCESS = 'Limited Access'
     VIEW_ONLY = 'Read-Only'
     
     ACCESS_LEVEL_CHOICES = [
         (FULL_ACCESS, 'Full Access'),
-        (LIMITED_ACCESS, 'Limited Access'),
         (VIEW_ONLY, 'Read-Only'),
     ]
     
@@ -19,15 +17,15 @@ class RolePermission(models.Model):
     role_name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     permissions = models.TextField(null=True, blank=True)
-    access_level = models.CharField(max_length=20, choices=ACCESS_LEVEL_CHOICES, default=LIMITED_ACCESS)
+    access_level = models.CharField(max_length=20, choices=ACCESS_LEVEL_CHOICES, default=VIEW_ONLY)
     
     def __str__(self):
         return self.role_name
     
     class Meta:
         db_table = 'roles_permission'
-        verbose_name = 'Role Permission'
-        verbose_name_plural = 'Role Permissions'
+        verbose_name = 'Role & Permission'
+        verbose_name_plural = 'Roles & Permissions'
         managed = False
 
 class User(models.Model):

@@ -1,0 +1,34 @@
+{% extends "user_manage/base.html" %}
+
+{% block title %}Delete Role - Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Delete Role</h2>
+    <a href="{% url 'user_manage:role_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Roles
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <h4 class="alert-heading">Warning!</h4>
+            <p>Are you sure you want to delete the role "{{ role.role_name }}"?</p>
+            <p>This action cannot be undone and may affect users assigned to this role.</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'user_manage:role_list' %}" class="btn btn-secondary me-md-2">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Confirm Delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

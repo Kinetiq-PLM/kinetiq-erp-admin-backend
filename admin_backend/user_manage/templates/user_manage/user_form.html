@@ -1,0 +1,136 @@
+{% extends "user_manage/base.html" %}
+
+{% block title %}{{ title }} - Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ title }}</h2>
+    <a href="{% url 'user_manage:user_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Users
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                        {{ form.first_name.errors }}
+                        <input type="text" name="{{ form.first_name.name }}" 
+                               id="{{ form.first_name.id_for_label }}" 
+                               value="{{ form.first_name.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.first_name.field.required %}required{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                        {{ form.last_name.errors }}
+                        <input type="text" name="{{ form.last_name.name }}" 
+                               id="{{ form.last_name.id_for_label }}" 
+                               value="{{ form.last_name.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.last_name.field.required %}required{% endif %}>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email.errors }}
+                        <input type="email" name="{{ form.email.name }}" 
+                               id="{{ form.email.id_for_label }}" 
+                               value="{{ form.email.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.email.field.required %}required{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                        {{ form.password.errors }}
+                        <input type="password" name="{{ form.password.name }}" 
+                               id="{{ form.password.id_for_label }}" 
+                               value="{{ form.password.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.password.field.required %}required{% endif %}>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.employee_id.id_for_label }}" class="form-label">Employee ID</label>
+                        {{ form.employee_id.errors }}
+                        <input type="text" name="{{ form.employee_id.name }}" 
+                               id="{{ form.employee_id.id_for_label }}" 
+                               value="{{ form.employee_id.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.role.id_for_label }}" class="form-label">Role</label>
+                        {{ form.role.errors }}
+                        <select name="{{ form.role.name }}" 
+                                id="{{ form.role.id_for_label }}" 
+                                class="form-select">
+                            <option value="">---------</option>
+                            {% for value, text in form.role.field.choices %}
+                                {% if value != "" %}
+                                    <option value="{{ value }}" {% if form.role.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                        {{ form.status.errors }}
+                        <select name="{{ form.status.name }}" 
+                                id="{{ form.status.id_for_label }}" 
+                                class="form-select"
+                                {% if form.status.field.required %}required{% endif %}>
+                            {% for value, text in form.status.field.choices %}
+                                <option value="{{ value }}" {% if form.status.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.type.id_for_label }}" class="form-label">Type</label>
+                        {{ form.type.errors }}
+                        <select name="{{ form.type.name }}" 
+                                id="{{ form.type.id_for_label }}" 
+                                class="form-select"
+                                {% if form.type.field.required %}required{% endif %}>
+                            {% for value, text in form.type.field.choices %}
+                                <option value="{{ value }}" {% if form.type.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
