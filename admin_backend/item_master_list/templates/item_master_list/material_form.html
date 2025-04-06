@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Raw Materials{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ title }}</h2>
+    <a href="{% url 'item_master_list:raw_material_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Raw Materials
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.material_name.id_for_label }}" class="form-label">Material Name</label>
+                        {{ form.material_name.errors }}
+                        <input type="text" name="{{ form.material_name.name }}" 
+                               id="{{ form.material_name.id_for_label }}" 
+                               value="{{ form.material_name.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.material_name.field.required %}required{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description.errors }}
+                        <textarea name="{{ form.description.name }}" 
+                                 id="{{ form.description.id_for_label }}" 
+                                 class="form-control"
+                                 rows="3">{{ form.description.value|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.unit_of_measure.id_for_label }}" class="form-label">Unit of Measure</label>
+                        {{ form.unit_of_measure.errors }}
+                        <input type="text" name="{{ form.unit_of_measure.name }}" 
+                               id="{{ form.unit_of_measure.id_for_label }}" 
+                               value="{{ form.unit_of_measure.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.unit_of_measure.field.required %}required{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.cost_per_unit.id_for_label }}" class="form-label">Cost Per Unit</label>
+                        {{ form.cost_per_unit.errors }}
+                        <input type="number" name="{{ form.cost_per_unit.name }}" 
+                               id="{{ form.cost_per_unit.id_for_label }}" 
+                               value="{{ form.cost_per_unit.value|default:'' }}" 
+                               class="form-control"
+                               step="0.01">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.vendor_code.id_for_label }}" class="form-label">Vendor Code</label>
+                        {{ form.vendor_code.errors }}
+                        <select name="{{ form.vendor_code.name }}" 
+                                id="{{ form.vendor_code.id_for_label }}" 
+                                class="form-select">
+                            <option value="">---------</option>
+                            {% for value, text in form.vendor_code.field.choices %}
+                                {% if value != "" %}
+                                    <option value="{{ value }}" {% if form.vendor_code.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

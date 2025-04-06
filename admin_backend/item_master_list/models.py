@@ -231,3 +231,32 @@ class ItemMasterData(models.Model):
         verbose_name_plural = 'Item Master Data'
         managed = False
 
+class ItemMasterDataForm(forms.ModelForm):
+    class Meta:
+        model = ItemMasterData
+        exclude = ['item_id', 'asset_id', 'product_id', 'material_id', 'item_name', 'item_type', 'unit_of_measure', 'item_status', 'manage_item_by']
+
+class AssetsForm(forms.ModelForm):
+    class Meta:
+        model = Assets
+        fields = ['asset_name', 'purchase_date', 'purchase_price', 'serial_no', 'content_id']
+        widgets = {
+            'purchase_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+class ProductsForm(forms.ModelForm):
+    class Meta:
+        model = Products
+        fields = ['product_name', 'description', 'selling_price', 'stock_level', 'unit_of_measure', 
+                 'batch_no', 'item_status', 'warranty_period', 'policy', 'content_id']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class RawMaterialsForm(forms.ModelForm):
+    class Meta:
+        model = RawMaterials
+        fields = ['material_name', 'description', 'unit_of_measure', 'cost_per_unit', 'vendor_code']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }

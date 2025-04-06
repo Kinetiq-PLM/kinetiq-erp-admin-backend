@@ -1,0 +1,29 @@
+{% extends "admin_backend/base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block header %}Admin Dashboard{% endblock %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">User Management</h5>
+                <p class="card-text">Manage users and roles in the system</p>
+                <a href="{% url 'user_manage:dashboard' %}" class="btn btn-light">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Item Master List</h5>
+                <p class="card-text">Manage products, materials, and assets</p>
+                <a href="{% url 'item_master_list:dashboard' %}" class="btn btn-light">Open</a>
+            </div>
+        </div>
+    </div>
+    <!-- You can add more cards for additional apps -->
+</div>
+{% endblock %}

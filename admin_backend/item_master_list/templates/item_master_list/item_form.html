@@ -1,0 +1,159 @@
+{% extends "item_master_list/base.html" %}
+
+{% block title %}{{ title }} - Item Master Data{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ title }}</h2>
+    <a href="{% url 'item_master_list:item_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Items
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.preferred_vendor.id_for_label }}" class="form-label">Preferred Vendor</label>
+                        {{ form.preferred_vendor.errors }}
+                        <input type="text" name="{{ form.preferred_vendor.name }}" 
+                               id="{{ form.preferred_vendor.id_for_label }}" 
+                               value="{{ form.preferred_vendor.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.purchasing_uom.id_for_label }}" class="form-label">Purchasing UOM</label>
+                        {{ form.purchasing_uom.errors }}
+                        <input type="text" name="{{ form.purchasing_uom.name }}" 
+                               id="{{ form.purchasing_uom.id_for_label }}" 
+                               value="{{ form.purchasing_uom.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.items_per_purchase_unit.id_for_label }}" class="form-label">Items Per Purchase Unit</label>
+                        {{ form.items_per_purchase_unit.errors }}
+                        <input type="number" name="{{ form.items_per_purchase_unit.name }}" 
+                               id="{{ form.items_per_purchase_unit.id_for_label }}" 
+                               value="{{ form.items_per_purchase_unit.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.purchase_quantity_per_package.id_for_label }}" class="form-label">Purchase Quantity Per Package</label>
+                        {{ form.purchase_quantity_per_package.errors }}
+                        <input type="number" name="{{ form.purchase_quantity_per_package.name }}" 
+                               id="{{ form.purchase_quantity_per_package.id_for_label }}" 
+                               value="{{ form.purchase_quantity_per_package.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.sales_uom.id_for_label }}" class="form-label">Sales UOM</label>
+                        {{ form.sales_uom.errors }}
+                        <input type="text" name="{{ form.sales_uom.name }}" 
+                               id="{{ form.sales_uom.id_for_label }}" 
+                               value="{{ form.sales_uom.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.items_per_sale_unit.id_for_label }}" class="form-label">Items Per Sale Unit</label>
+                        {{ form.items_per_sale_unit.errors }}
+                        <input type="number" name="{{ form.items_per_sale_unit.name }}" 
+                               id="{{ form.items_per_sale_unit.id_for_label }}" 
+                               value="{{ form.items_per_sale_unit.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.sales_quantity_per_package.id_for_label }}" class="form-label">Sales Quantity Per Package</label>
+                        {{ form.sales_quantity_per_package.errors }}
+                        <input type="number" name="{{ form.sales_quantity_per_package.name }}" 
+                               id="{{ form.sales_quantity_per_package.id_for_label }}" 
+                               value="{{ form.sales_quantity_per_package.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="{{ form.product.id_for_label }}" class="form-label">Product</label>
+                        {{ form.product.errors }}
+                        <select name="{{ form.product.name }}" 
+                                id="{{ form.product.id_for_label }}" 
+                                class="form-select">
+                            <option value="">---------</option>
+                            {% for value, text in form.product.field.choices %}
+                                {% if value != "" %}
+                                    <option value="{{ value }}" {% if form.product.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="{{ form.material.id_for_label }}" class="form-label">Raw Material</label>
+                        {{ form.material.errors }}
+                        <select name="{{ form.material.name }}" 
+                                id="{{ form.material.id_for_label }}" 
+                                class="form-select">
+                            <option value="">---------</option>
+                            {% for value, text in form.material.field.choices %}
+                                {% if value != "" %}
+                                    <option value="{{ value }}" {% if form.material.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="{{ form.asset.id_for_label }}" class="form-label">Asset</label>
+                        {{ form.asset.errors }}
+                        <select name="{{ form.asset.name }}" 
+                                id="{{ form.asset.id_for_label }}" 
+                                class="form-select">
+                            <option value="">---------</option>
+                            {% for value, text in form.asset.field.choices %}
+                                {% if value != "" %}
+                                    <option value="{{ value }}" {% if form.asset.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

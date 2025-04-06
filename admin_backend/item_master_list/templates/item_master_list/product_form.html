@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Products{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ title }}</h2>
+    <a href="{% url 'item_master_list:product_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Products
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.product_name.id_for_label }}" class="form-label">Product Name</label>
+                        {{ form.product_name.errors }}
+                        <input type="text" name="{{ form.product_name.name }}" 
+                               id="{{ form.product_name.id_for_label }}" 
+                               value="{{ form.product_name.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.product_name.field.required %}required{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description.errors }}
+                        <textarea name="{{ form.description.name }}" 
+                                 id="{{ form.description.id_for_label }}" 
+                                 class="form-control"
+                                 rows="3">{{ form.description.value|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.selling_price.id_for_label }}" class="form-label">Selling Price</label>
+                        {{ form.selling_price.errors }}
+                        <input type="number" name="{{ form.selling_price.name }}" 
+                               id="{{ form.selling_price.id_for_label }}" 
+                               value="{{ form.selling_price.value|default:'' }}" 
+                               class="form-control"
+                               step="0.01"
+                               {% if form.selling_price.field.required %}required{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.stock_level.id_for_label }}" class="form-label">Stock Level</label>
+                        {{ form.stock_level.errors }}
+                        <input type="number" name="{{ form.stock_level.name }}" 
+                               id="{{ form.stock_level.id_for_label }}" 
+                               value="{{ form.stock_level.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.stock_level.field.required %}required{% endif %}>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.unit_of_measure.id_for_label }}" class="form-label">Unit of Measure</label>
+                        {{ form.unit_of_measure.errors }}
+                        <input type="text" name="{{ form.unit_of_measure.name }}" 
+                               id="{{ form.unit_of_measure.id_for_label }}" 
+                               value="{{ form.unit_of_measure.value|default:'' }}" 
+                               class="form-control"
+                               {% if form.unit_of_measure.field.required %}required{% endif %}>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.batch_no.id_for_label }}" class="form-label">Batch No</label>
+                        {{ form.batch_no.errors }}
+                        <input type="text" name="{{ form.batch_no.name }}" 
+                               id="{{ form.batch_no.id_for_label }}" 
+                               value="{{ form.batch_no.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.item_status.id_for_label }}" class="form-label">Item Status</label>
+                        {{ form.item_status.errors }}
+                        <select name="{{ form.item_status.name }}" 
+                                id="{{ form.item_status.id_for_label }}" 
+                                class="form-select"
+                                {% if form.item_status.field.required %}required{% endif %}>
+                            {% for value, text in form.item_status.field.choices %}
+                                <option value="{{ value }}" {% if form.item_status.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.warranty_period.id_for_label }}" class="form-label">Warranty Period</label>
+                        {{ form.warranty_period.errors }}
+                        <input type="text" name="{{ form.warranty_period.name }}" 
+                               id="{{ form.warranty_period.id_for_label }}" 
+                               value="{{ form.warranty_period.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.policy.id_for_label }}" class="form-label">Policy</label>
+                        {{ form.policy.errors }}
+                        <select name="{{ form.policy.name }}" 
+                                id="{{ form.policy.id_for_label }}" 
+                                class="form-select">
+                            <option value="">---------</option>
+                            {% for value, text in form.policy.field.choices %}
+                                {% if value != "" %}
+                                    <option value="{{ value }}" {% if form.policy.value == value|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.content_id.id_for_label }}" class="form-label">Content ID</label>
+                        {{ form.content_id.errors }}
+                        <input type="text" name="{{ form.content_id.name }}" 
+                               id="{{ form.content_id.id_for_label }}" 
+                               value="{{ form.content_id.value|default:'' }}" 
+                               class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

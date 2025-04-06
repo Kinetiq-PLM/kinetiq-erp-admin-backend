@@ -10,6 +10,7 @@ import uuid
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.db.models import Q
 
 # Web views (unchanged)
 @login_required
@@ -20,19 +21,87 @@ def dashboard(request):
 @login_required
 def user_list(request):
     """View to display all users in a table format"""
+    search_query = request.GET.get('search', '')
+    
+    sort_field = request.GET.get('sort', 'first_name')
+    sort_direction = request.GET.get('direction', 'asc')
+    
+    # Base queryset
     users = User.objects.all()
+    
+    # Apply search if provided
+    if search_query:
+        users = users.filter(
+            Q(first_name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(employee_id__icontains=search_query)
+        )
+    
+    # Apply sorting
+    order_by = sort_field
+    if sort_direction == 'desc':
+        order_by = f'-{sort_field}'
+    
+    # Handle special case for name sorting (uses first_name)
+    if sort_field == 'name':
+        order_by = 'first_name' if sort_direction == 'asc' else '-first_name'
+    elif sort_field == 'role':
+        order_by = 'role__role_name' if sort_direction == 'asc' else '-role__role_name'
+    elif sort_field == 'status':
+        if sort_direction == 'asc':
+            order_by = ['status', 'first_name']
+        else:
+            order_by = ['-status', 'first_name']
+    
+    users = users.order_by(*order_by) if isinstance(order_by, list) else users.order_by(order_by)
+    
     return render(request, 'user_manage/user_list.html', {
         'users': users,
-        'active_tab': 'users'
+        'active_tab': 'users',
+        'active_app': 'user_manage',
+        'search_query': search_query,
+        'sort_field': sort_field,
+        'sort_direction': sort_direction
     })
 
 @login_required
 def role_list(request):
     """View to display all roles in a table format"""
+    search_query = request.GET.get('search', '')
+    sort_field = request.GET.get('sort', 'role_name')
+    sort_direction = request.GET.get('direction', 'asc')
+    
+    # Base queryset
     roles = RolePermission.objects.all()
+    
+    # Apply search if provided
+    if search_query:
+        roles = roles.filter(
+            Q(role_name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+    
+    # Apply sorting
+    order_by = sort_field
+    if sort_direction == 'desc':
+        order_by = f'-{sort_field}'
+
+    if sort_field == 'access_level':
+        if sort_direction == 'asc':
+            order_by = ['access_level', 'role_name']
+        else:
+            order_by = ['-access_level', 'role_name']
+    
+    roles = roles.order_by(*order_by) if isinstance(order_by, list) else roles.order_by(order_by)
+    
     return render(request, 'user_manage/role_list.html', {
         'roles': roles,
-        'active_tab': 'roles'
+        'active_tab': 'roles',
+        'active_app': 'user_manage',
+        'search_query': search_query,
+        'sort_field': sort_field,
+        'sort_direction': sort_direction
     })
 
 @login_required
@@ -91,7 +160,8 @@ def add_user(request):
     return render(request, 'user_manage/user_form.html', {
         'form': form,
         'title': 'Add New User',
-        'active_tab': 'users'
+        'active_tab': 'users',
+        'active_app': 'user_manage'  # Add this line
     })
 
 @login_required
@@ -147,7 +217,8 @@ def edit_user(request, user_id):
     return render(request, 'user_manage/user_form.html', {
         'form': form,
         'title': 'Edit User',
-        'active_tab': 'users'
+        'active_tab': 'users',
+        'active_app': 'user_manage'  # Add this line
     })
 
 @login_required
@@ -193,7 +264,8 @@ def add_role(request):
     return render(request, 'user_manage/role_form.html', {
         'form': form,
         'title': 'Add New Role',
-        'active_tab': 'roles'
+        'active_tab': 'roles',
+        'active_app': 'user_manage'  # Add this line
     })
 
 @login_required
@@ -236,7 +308,8 @@ def edit_role(request, role_id):
     return render(request, 'user_manage/role_form.html', {
         'form': form,
         'title': 'Edit Role',
-        'active_tab': 'roles'
+        'active_tab': 'roles',
+        'active_app': 'user_manage'  # Add this line
     })
 
 @login_required
@@ -256,7 +329,8 @@ def delete_role(request, role_id):
     
     return render(request, 'user_manage/role_confirm_delete.html', {
         'role': role,
-        'active_tab': 'roles'
+        'active_tab': 'roles',
+        'active_app': 'user_manage'  # Add this line
     })
 
 # API Views (new)

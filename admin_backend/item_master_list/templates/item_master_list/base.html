@@ -1,0 +1,33 @@
+{% extends "admin_backend/base.html" %}
+
+{% block title %}Item Master List{% endblock %}
+
+{% block header %}Item Master List{% endblock %}
+
+{% block app_content %}
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'products' %}active{% endif %}" href="{% url 'item_master_list:product_list' %}">
+                <i class="bi bi-box"></i> Products
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'raw_materials' %}active{% endif %}" href="{% url 'item_master_list:raw_material_list' %}">
+                <i class="bi bi-tools"></i> Raw Materials
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'assets' %}active{% endif %}" href="{% url 'item_master_list:asset_list' %}">
+                <i class="bi bi-laptop"></i> Assets
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'item_master' %}active{% endif %}" href="{% url 'item_master_list:item_list' %}">
+                <i class="bi bi-list-check"></i> Item Master Data
+            </a>
+        </li>
+    </ul>
+    
+    {% block content %}{% endblock %}
+{% endblock %}

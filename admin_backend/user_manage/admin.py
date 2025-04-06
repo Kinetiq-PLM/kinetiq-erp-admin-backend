@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import User, RolePermission, RolePermissionForm, UserForm
 from django.utils import timezone
-from django.contrib import admin
 from django.db import connection
 
 

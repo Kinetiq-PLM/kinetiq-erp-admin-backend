@@ -1,0 +1,50 @@
+{% extends "item_master_list/base.html" %}
+
+{% block title %}Delete Item{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h4>Confirm Deletion</h4>
+        </div>
+        <div class="card-body">
+            <p class="lead">Are you sure you want to delete the item "{{ item.item_name }}"?</p>
+            <p class="text-danger"><strong>Warning:</strong> This action cannot be undone.</p>
+            
+            <div class="card mb-3">
+                <div class="card-header">
+                    Item Details
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Item ID:</dt>
+                        <dd class="col-sm-9">{{ item.item_id }}</dd>
+                        
+                        <dt class="col-sm-3">Item Name:</dt>
+                        <dd class="col-sm-9">{{ item.item_name }}</dd>
+                        
+                        <dt class="col-sm-3">Item Type:</dt>
+                        <dd class="col-sm-9">{{ item.get_item_type_display }}</dd>
+                        
+                        <dt class="col-sm-3">Status:</dt>
+                        <dd class="col-sm-9">{{ item.get_item_status_display }}</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Confirm Delete
+                    </button>
+                    <a href="{% url 'item_master_list:item_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
