@@ -43,12 +43,14 @@ INSTALLED_APPS = [
     "django_cognito_jwt",
     'widget_tweaks',
 
+    'login',
+    'audit_log',
     "user_manage",
     "item_master_list",
-    "business_partner_master_list",
-    "warehouse",
-    "policies",
-    "currency",
+    # "business_partner_master_list",
+    # "warehouse",
+    # "policies",
+    # "currency",
 ]
 
 MIDDLEWARE = [
@@ -62,7 +64,21 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
+# Allow requests from React frontend
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:8000",  # Adjust this React apps URL
+# ]
+
 CORS_ALLOW_ALL_ORIGINS = True
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ),
+#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAuthenticated',
+#     ),
+# }
 
 REST_FRAMEWORK = {
     'DEFAULT-PERMISSION-CLASSES': (
@@ -72,6 +88,25 @@ REST_FRAMEWORK = {
         "django_cognito_jwt.JSONWebTokenAuthentication",
     ),
 }
+
+# from datetime import timedelta
+
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+#     'ROTATE_REFRESH_TOKENS': False,
+#     'BLACKLIST_AFTER_ROTATION': True,
+#     'ALGORITHM': 'HS256',
+#     'SIGNING_KEY': SECRET_KEY,
+#     'VERIFYING_KEY': None,
+#     'AUTH_HEADER_TYPES': ('Bearer',),
+#     'USER_ID_FIELD': 'id',
+#     'USER_ID_CLAIM': 'user_id',
+#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+#     'TOKEN_TYPE_CLAIM': 'token_type',
+# }
+
+# AUTH_USER_MODEL = 'login.User'
 
 ROOT_URLCONF = 'admin_backend.urls'
 
@@ -93,14 +128,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'admin_backend.wsgi.application'
 
-AWS_COGNITO_SETTINGS = {
-    'REGION': 'us-east-1',  # Your AWS region
-    'USER_POOL_ID': 'us-east-1_xxxxxxxx',  # Your User Pool ID
-    'APP_CLIENT_ID': 'your-app-client-id',  # Your App Client ID
-    'APP_CLIENT_SECRET': 'your-app-client-secret',  # Your App Client Secret (if applicable)
-    'DOMAIN': 'your-domain.auth.us-east-1.amazoncognito.com',  # Your Cognito domain
-    'REDIRECT_URI': 'https://your-domain.com/auth/callback/',  # Callback URL after authentication
-}
+# AWS_COGNITO_SETTINGS = {
+#     'REGION': 'us-east-1',  # Your AWS region
+#     'USER_POOL_ID': 'us-east-1_xxxxxxxx',  # Your User Pool ID
+#     'APP_CLIENT_ID': 'your-app-client-id',  # Your App Client ID
+#     'APP_CLIENT_SECRET': 'your-app-client-secret',  # Your App Client Secret (if applicable)
+#     'DOMAIN': 'your-domain.auth.us-east-1.amazoncognito.com',  # Your Cognito domain
+#     'REDIRECT_URI': 'https://your-domain.com/auth/callback/',  # Callback URL after authentication
+# }
 
 
 # Database

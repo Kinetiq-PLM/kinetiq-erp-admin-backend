@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from django import forms
 
 class BusinessPartnerMaster(models.Model):
     EMPLOYEE = 'Employee'
@@ -52,3 +54,13 @@ class Vendor(models.Model):
         verbose_name = 'Vendor'
         verbose_name_plural = 'Vendors'
         managed = False
+
+class BusinessPartnerMasterForm(forms.ModelForm):
+    class Meta:
+        model = BusinessPartnerMaster
+        fields = ['partner_id', 'employee_id', 'vendor_code', 'customer_id', 'partner_name', 'category', 'contact_info']
+
+class VendorForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = ['vendor_code', 'application_reference', 'vendor_name', 'contact_person', 'status']

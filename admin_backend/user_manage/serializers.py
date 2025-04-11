@@ -2,78 +2,81 @@ from rest_framework import serializers
 from .models import User, RolePermission
 
 class RolePermissionSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the RolePermission model.
-    Handles validation and conversion between JSON and model objects.
-    """
+    
     class Meta:
         model = RolePermission
         fields = ['role_id', 'role_name', 'description', 'permissions', 'access_level']
-        read_only_fields = ['role_id']  # role_id is auto-generated and shouldn't be edited directly
-
+        read_only_fields = ['role_id']
+    
     def create(self, validated_data):
-        """
-        Create and return a new RolePermission instance, given the validated data.
-        """
-        # The role_id is handled in the view with raw SQL, so we don't need to set it here
-        return RolePermission(**validated_data)
-
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing RolePermission instance, given the validated data.
-        """
-        instance.role_name = validated_data.get('role_name', instance.role_name)
-        instance.description = validated_data.get('description', instance.description)
-        instance.permissions = validated_data.get('permissions', instance.permissions)
-        instance.access_level = validated_data.get('access_level', instance.access_level)
-        
-        # Note: We don't call save() here because in the views, raw SQL is used for persistence
-        return instance
+        # Generate a unique role_id
+        import uuid
+        role_id = f"ADMIN-ROLE-{uuid.uuid4().hex[:6]}"
+        validated_data['role_id'] = role_id
+        return super().create(validated_data)
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the User model.
-    Handles validation and conversion between JSON and model objects.
-    """
-    role_name = serializers.SerializerMethodField()
+    role_details = RolePermissionSerializer(source='role', read_only=True)
+    # Replace the CharField with a PrimaryKeyRelatedField to create a dropdown
+    role_id = serializers.PrimaryKeyRelatedField(
+        source='role',
+        queryset=RolePermission.objects.all(),
+        required=False,
+        allow_null=True,
+        label='Role'
+    )
+
+    # Add this field to make password optional during updates
+    password = serializers.CharField(
+        write_only=True,  # Hide password in responses
+        required=False,   # Make it optional for updates
+        style={'input_type': 'password'}  # For UI rendering as password field
+    )
+    
+    # Add a display field for showing role names in the dropdown
+    role_display = serializers.SerializerMethodField(read_only=True)
+    
+    def get_role_display(self, obj):
+        if obj.role:
+            return obj.role.role_name
+        return None
     
     class Meta:
         model = User
-        fields = [
-            'user_id', 'employee_id', 'first_name', 'last_name', 
-            'email', 'password', 'role', 'role_name', 'status', 
-            'type', 'created_at', 'updated_at'
-        ]
-        read_only_fields = ['user_id', 'created_at', 'updated_at']  # These fields are auto-generated
-
-    def get_role_name(self, obj):
-        """Return the name of the role, if a role exists."""
-        return obj.role.role_name if obj.role else None
-
+        fields = ['user_id', 'employee_id', 'first_name', 'last_name', 'email', 
+                 'password', 'role_id', 'role_display', 'role_details', 'status', 'type', 
+                 'created_at', 'updated_at']
+        read_only_fields = ['user_id', 'employee_id', 'created_at', 'updated_at', 'role_display']
+        # extra_kwargs = {
+        #     'password': {'write_only': True}
+        # }
+    
     def create(self, validated_data):
-        """
-        Create and return a new User instance, given the validated data.
-        """
-        # The user_id is handled in the view with raw SQL, so we don't need to set it here
-        return User(**validated_data)
+        # Generate a unique user_id
+        import uuid
+        user_id = f"USER-{uuid.uuid4().hex[:8].upper()}"
+        validated_data['user_id'] = user_id
+        return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        """
-        Update and return an existing User instance, given the validated data.
-        """
-        instance.employee_id = validated_data.get('employee_id', instance.employee_id)
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.email = validated_data.get('email', instance.email)
-        instance.password = validated_data.get('password', instance.password)
-        instance.role = validated_data.get('role', instance.role)
-        instance.status = validated_data.get('status', instance.status)
-        instance.type = validated_data.get('type', instance.type)
+        # For update: if password is empty or not provided, remove it from validated_data
+        # to avoid updating the password field
+        if 'password' in validated_data and not validated_data['password']:
+            validated_data.pop('password')
         
-        # Note: We don't call save() here because in the views, raw SQL is used for persistence
-        return instance
-
+        # For update: Since there's no trigger for update password hashing,
+        # we need to explicitly call the hash_user_passwords function
+        updated_instance = super().update(instance, validated_data)
+        
+        # If password was updated, call the hash function
+        from django.db import connection
+        if 'password' in validated_data:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT admin.hash_user_passwords();")
+        
+        return updated_instance
+    
     def validate_password(self, value):
         """
         Add custom validation for password if needed.
@@ -82,3 +85,20 @@ class UserSerializer(serializers.ModelSerializer):
         if len(value) < 8:
             raise serializers.ValidationError("Password must be at least 8 characters long.")
         return value
+
+    def to_representation(self, instance):
+        # This customizes the output representation
+        ret = super().to_representation(instance)
+        # Remove role_id from output to avoid confusion
+        # since we're now passing the whole role object
+        if 'role_id' in ret and ret['role_id'] is not None:
+            del ret['role_id']
+        return ret
+
+
+# If you want to provide a list of roles for a dropdown in the frontend,
+# you can create a simple serializer like this:
+class RoleChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RolePermission
+        fields = ['role_id', 'role_name']

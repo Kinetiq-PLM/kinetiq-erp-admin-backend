@@ -38,16 +38,36 @@ class Policies(models.Model):
     effective_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ACTIVE)
 
+    def __str__(self):
+        return self.policy_name
+
     class Meta:
-        managed = False
         db_table = 'policies'
+        verbose_name = 'Policy'
+        verbose_name_plural = 'Policies'
+        managed = False
+        
 
 class Vendor(models.Model):
+
+    ACTIVE = 'Active'
+    INACTIVE = 'Inactive'
+    BLOCKED = 'Blocked'
+
+    STATUS_CHOICES = [
+        (ACTIVE, 'Active'),
+        (INACTIVE, 'Inactive'),
+        (BLOCKED, 'Blocked')
+    ]
+
     vendor_code = models.CharField(primary_key=True, max_length=255)
     application_reference = models.CharField(max_length=255, blank=True, null=True)
     vendor_name = models.CharField(max_length=255)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
-    status = models.TextField(blank=True, null=True)  # This field type is a guess.
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ACTIVE)
+
+    def __str__(self):
+        return self.vendor_name
 
     class Meta:
         managed = False
@@ -97,7 +117,7 @@ class Products(models.Model):
     batch_no = models.CharField(max_length=255, blank=True, null=True)
     item_status = models.CharField(max_length=20, choices=ITEM_STATUS_CHOICES, default=ACTIVE)
     warranty_period = models.IntegerField(blank=True, null=True)
-    policy = models.ForeignKey(Policies, models.DO_NOTHING, blank=True, null=True)
+    policy = models.ForeignKey(Policies, models.DO_NOTHING, blank=True, null=True, to_field='policy_id', db_column='policy_id')
     content_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
@@ -139,7 +159,7 @@ class RawMaterials(models.Model):
     description = models.TextField(blank=True, null=True)
     unit_of_measure = models.CharField(max_length=5, choices=UOM_CHOICES, default=KG)
     cost_per_unit = models.DecimalField(max_digits=65535, decimal_places=2, blank=True, null=True)
-    vendor_code = models.ForeignKey(Vendor, models.DO_NOTHING, db_column='vendor_code', blank=True, null=True)
+    vendor_code = models.ForeignKey(Vendor, models.DO_NOTHING, blank=True, null=True, to_field='vendor_code', db_column='vendor_code')
 
     def __str__(self):
         return self.material_name
