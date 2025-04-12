@@ -22,4 +22,10 @@ urlpatterns = [
     path('api/', include('login.urls')),
     path('api/', include('user_manage.urls')),
     path('api/', include('item_master_list.urls')),
+    path('api/', include('business_partner_master_list.urls')),
+    path('api/', include('policies.urls')),
+    path('api/', include('audit_log.urls')),
+    path('api/', include('warehouse.urls')),
+    path('api/', include('currency.urls')),  
+
 ]

@@ -7,5 +7,5 @@ router.register(r'users', UserViewSet)
 router.register(r'roles', RolePermissionViewSet)
 
 urlpatterns = [
-    path('manage', include(router.urls)),
+    path('manage/', include(router.urls)),
 ]

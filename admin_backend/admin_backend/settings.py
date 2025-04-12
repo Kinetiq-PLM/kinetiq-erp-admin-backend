@@ -47,10 +47,10 @@ INSTALLED_APPS = [
     'audit_log',
     "user_manage",
     "item_master_list",
-    # "business_partner_master_list",
-    # "warehouse",
-    # "policies",
-    # "currency",
+    "business_partner_master_list",
+    "warehouse",
+    "policies",
+    "currency",
 ]
 
 MIDDLEWARE = [
