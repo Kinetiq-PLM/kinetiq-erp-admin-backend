@@ -1,3 +1,4 @@
+# user_manage/views.py
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from .models import User, RolePermission
@@ -28,7 +29,7 @@ class RolePermissionViewSet(viewsets.ModelViewSet):
 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['role_name', 'description']
-    ordering_fields = ['role_name', 'access_level']
+    ordering_fields = ['role_name', 'permissions']
     ordering = ['role_name']  # Default ordering
 
     

@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,7 +28,10 @@ SECRET_KEY = 'django-insecure-fr$c(xhti7b44ov4zikf^0*=h$lrxkk5*k&x@0g@28#s3618f9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["j24fs2pfwf.execute-api.ap-southeast-1.amazonaws.com", 
+                 "127.0.0.1",
+                    "localhost",
+                ]
 
 
 # Application definition
@@ -51,7 +57,13 @@ INSTALLED_APPS = [
     "warehouse",
     "policies",
     "currency",
+
+    'django_celery_beat',  # For scheduling tasks
 ]
+
+# Media settings for file uploads
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,12 +76,14 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-# Allow requests from React frontend
+# # Allow requests from React frontend
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:8000",  # Adjust this React apps URL
 # ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
 
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -149,11 +163,44 @@ DATABASES = {
         'PASSWORD': 'admindatabase',
         'HOST': 'localhost',
         'PORT': '5432',       # default PostgreSQL port
-        'OPTIONS': {
-            'options': '-c search_path=admin,public'
-        },
+        # 'OPTIONS': {
+        #     'options': '-c search_path=admin,public'
+        # },
     }
 }
+
+import os
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'Kinetiq-DB'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'KntBg3jIY0DbpH8G9bwt'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', '15432'),
+        # 'OPTIONS': {
+        #     'options': '-c search_path=admin,public'
+        # },
+    }
+}
+
+# Celery Configuration
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'update-exchange-rates-daily': {
+        'task': 'currency.tasks.update_currency_exchange_rates',
+        'schedule': crontab(hour=0, minute=0),  # Run at midnight every day
+        # Alternatively: 'schedule': timedelta(days=1),
+    },
+}
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Default Redis port and db 0
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC+08:00'  # Using your project's timezone setting
 
 
 # Password validation

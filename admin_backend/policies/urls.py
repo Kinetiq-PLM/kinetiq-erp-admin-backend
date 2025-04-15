@@ -7,4 +7,5 @@ router.register(r'', PoliciesViewSet, basename='policies')
 
 urlpatterns = [
     path('policies/', include(router.urls)),
+    path('debug-file/<str:filename>/', PoliciesViewSet.debug_file_path, name='debug_file_path'),
 ]

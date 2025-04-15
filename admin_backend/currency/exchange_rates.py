@@ -1,0 +1,119 @@
+# currency/exchange_rates.py
+import requests
+from datetime import date, timedelta
+from decimal import Decimal
+import logging
+
+from .models import Currency
+
+logger = logging.getLogger(__name__)
+
+class ExchangeRateService:
+    """Service to fetch and update currency exchange rates"""
+    
+    # Free exchange rate API that doesn't require authentication
+    BASE_URL = 'https://open.er-api.com/v6/latest/PHP' 
+    BACKUP_URL = 'https://open.er-api.com/v6/latest/PHP'  
+    
+    @classmethod
+    def fetch_latest_rates(cls):
+        """Fetch latest exchange rates from free API services"""
+        apis = [
+            {'url': cls.BASE_URL, 'params': {'base': 'PHP'}},
+            {'url': cls.BACKUP_URL, 'params': {}}
+        ]
+        
+        for api in apis:
+            try:
+                response = requests.get(api['url'], params=api['params'], timeout=10)
+                response.raise_for_status()
+                
+                data = response.json()
+                
+                # Handle different API response structures
+                if 'rates' in data:
+                    logger.info(f"Successfully fetched rates from {api['url']}")
+                    return {
+                        'base_code': data.get('base_code', data.get('base', 'PHP')),
+                        'rates': data.get('conversion_rates', data.get('rates', {})),
+                        'date': data.get('date', date.today().isoformat())
+                    }
+                
+                logger.warning(f"API response format not recognized: {api['url']}")
+                
+            except Exception as e:
+                logger.warning(f"Failed to fetch rates from {api['url']}: {str(e)}")
+        
+        # If we get here, all APIs failed
+        logger.error("All exchange rate APIs failed")
+        return None
+    
+    @classmethod
+    def update_exchange_rates(cls):
+        """Update exchange rates in the database"""
+        rates_data = cls.fetch_latest_rates()
+        if not rates_data:
+            logger.error("Failed to update exchange rates: No data received")
+            return False
+        
+        today = date.today()
+        success_count = 0
+        unchanged_count = 0
+        error_count = 0
+        
+        # Process each currency rate
+        for currency_code, rate in rates_data['rates'].items():
+            try:
+                decimal_rate = Decimal(str(rate))
+                
+                # Try to get the most recent active currency record
+                currency_name = f"{currency_code} Currency"
+                current_currency = Currency.objects.filter(
+                    currency_name=currency_name,
+                    valid_to__isnull=True
+                ).first()
+                
+                if current_currency:
+                    # Check if rate has actually changed
+                    if current_currency.exchange_rate != decimal_rate:
+                        # Only update if rate has changed
+                        logger.info(f"Rate changed for {currency_code}: {current_currency.exchange_rate} -> {decimal_rate}")
+                        
+                        # Set end date for current rate
+                        current_currency.valid_to = today - timedelta(days=1)
+                        current_currency.save()
+                        
+                        # Create new entry with updated rate
+                        Currency.objects.create(
+                            currency_id=currency_code,
+                            currency_name=current_currency.currency_name,  # Keep existing name
+                            exchange_rate=decimal_rate,
+                            valid_from=today,
+                            valid_to=None
+                        )
+                        success_count += 1
+                    else:
+                        # Rate hasn't changed, no need to update
+                        logger.debug(f"Rate unchanged for {currency_code}: {decimal_rate}")
+                        unchanged_count += 1
+                else:
+                    # Create new currency entry (either new currency or no active record exists)
+                    any_currency = Currency.objects.filter(currency_id=currency_name).first()
+                    
+                    Currency.objects.create(
+                        currency_id=currency_code,
+                        # Use existing name if available, otherwise create default
+                        currency_name=any_currency.currency_name if any_currency else currency_name,
+                        exchange_rate=decimal_rate,
+                        valid_from=today,
+                        valid_to=None
+                    )
+                    success_count += 1
+                    logger.info(f"Created new record for {currency_code}: {decimal_rate}")
+                
+            except Exception as e:
+                logger.error(f"Error updating {currency_code}: {str(e)}")
+                error_count += 1
+        
+        logger.info(f"Exchange rate update completed: {success_count} updated, {unchanged_count} unchanged, {error_count} failed")
+        return success_count > 0 or unchanged_count > 0

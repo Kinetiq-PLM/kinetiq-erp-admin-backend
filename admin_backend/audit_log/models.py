@@ -9,7 +9,7 @@ class AuditLog(models.Model):
     ip_address = models.CharField(max_length=255, null=True, blank=True)
     
     class Meta:
-        db_table = 'audit_log'
+        db_table = '"admin"."audit_log"'
         
     @staticmethod
     def generate_log_id():

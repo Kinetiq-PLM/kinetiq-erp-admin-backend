@@ -1,3 +1,4 @@
+# login/models.py
 from django.db import models
 
 class UserStatus(models.TextChoices):
@@ -24,7 +25,7 @@ class RolesPermission(models.Model):
     )
     
     class Meta:
-        db_table = 'roles_permission'
+        db_table = '"admin"."roles_permission"'
         
     def get_modules_list(self):
         """Return the permissions as a list of module names"""
@@ -60,4 +61,4 @@ class User(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        db_table = 'users'
+        db_table = '"admin"."users"'

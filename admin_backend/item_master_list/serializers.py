@@ -53,12 +53,12 @@ class VendorSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 class ProductsSerializer(serializers.ModelSerializer):
-    policy_details = PoliciesSerializer(source='policies', read_only=True)
+    policy_details = PoliciesSerializer(source='policy', read_only=True)
     
     # Replace the existing policy_id field with this improved version
     policy_id = serializers.PrimaryKeyRelatedField(
-        source='policies',
-        queryset=Policies.objects.all(),
+        source='policy',
+        queryset=Policies.objects.all().order_by('policy_name'),
         required=False,
         allow_null=True,
         label='Policy'
@@ -86,12 +86,18 @@ class ProductsSerializer(serializers.ModelSerializer):
         validated_data['product_id'] = product_id
         return super().create(validated_data)
     
+    def update(self, instance, validated_data):
+        # Set content_id to null if empty to avoid FK constraint violation
+        if 'content_id' in validated_data and not validated_data['content_id']:
+            validated_data['content_id'] = None
+            
+        return super().update(instance, validated_data)
+    
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         # Only remove policy_id if we're showing full details
-        if self.context.get('action') not in ['create', 'update', 'partial_update']:
-            if 'policy_id' in ret and ret['policy_id'] is not None:
-                del ret['policy_id']
+        if 'policy_id' in ret:
+            pass
         return ret
 
 class RawMaterialsSerializer(serializers.ModelSerializer):
@@ -128,60 +134,98 @@ class RawMaterialsSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        if 'vendor_id' in ret and ret['vendor_id'] is not None:
-            del ret['vendor_id']
+        if 'vendor_id' in ret:
+            pass
         return ret
 
 class ItemMasterDataSerializer(serializers.ModelSerializer):
-    asset_details = AssetsSerializer(source='asset', read_only=True)
-    product_details = ProductsSerializer(source='product', read_only=True)
-    material_details = RawMaterialsSerializer(source='material', read_only=True)
+    # asset_details = AssetsSerializer(source='asset', read_only=True)
+    # product_details = ProductsSerializer(source='product', read_only=True)
+    # material_details = RawMaterialsSerializer(source='material', read_only=True)
     
-    asset_id = serializers.PrimaryKeyRelatedField(
-        source='asset',
-        queryset=Assets.objects.all(),
+    # # These fields will be removed from create/edit forms but remain in detail views
+    # asset_id = serializers.PrimaryKeyRelatedField(
+    #     source='asset',
+    #     queryset=Assets.objects.all(),
+    #     required=False,
+    #     allow_null=True,
+    #     label='Asset',
+    #     write_only=True  # Hide in output
+    # )
+    
+    # product_id = serializers.PrimaryKeyRelatedField(
+    #     source='product',
+    #     queryset=Products.objects.all(),
+    #     required=False,
+    #     allow_null=True,
+    #     label='Product',
+    #     write_only=True  # Hide in output
+    # )
+    
+    # material_id = serializers.PrimaryKeyRelatedField(
+    #     source='material',
+    #     queryset=RawMaterials.objects.all(),
+    #     required=False,
+    #     allow_null=True,
+    #     label='Material',
+    #     write_only=True  # Hide in output
+    # )
+    
+    # Convert preferred_vendor to dropdown using vendor choices
+    preferred_vendor = serializers.ChoiceField(
+        choices=[], 
         required=False,
         allow_null=True,
-        label='Asset'
+        allow_blank=True
     )
     
-    product_id = serializers.PrimaryKeyRelatedField(
-        source='product',
-        queryset=Products.objects.all(),
-        required=False,
-        allow_null=True,
-        label='Product'
-    )
+    # Add a display field for vendor name
+    preferred_vendor_name = serializers.SerializerMethodField(read_only=True)
+
+    def get_preferred_vendor_name(self, obj):
+        if obj.preferred_vendor:
+            # Since preferred_vendor is now a relationship, get the name
+            try:
+                vendor = Vendor.objects.get(vendor_code=obj.preferred_vendor)
+                return vendor.vendor_name
+            except Vendor.DoesNotExist:
+                return None
+        return None
     
-    material_id = serializers.PrimaryKeyRelatedField(
-        source='material',
-        queryset=RawMaterials.objects.all(),
-        required=False,
-        allow_null=True,
-        label='Material'
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Dynamically populate vendor choices
+        vendors = Vendor.objects.all().order_by('vendor_name')
+        self.fields['preferred_vendor'].choices = [(v.vendor_code, v.vendor_name) for v in vendors]
     
     class Meta:
         model = ItemMasterData
         fields = ['item_id', 'asset_id', 'product_id', 'material_id', 'item_name', 'item_type',
                  'unit_of_measure', 'item_status', 'manage_item_by', 'preferred_vendor',
-                 'purchasing_uom', 'items_per_purchase_unit', 'purchase_quantity_per_package',
-                 'sales_uom', 'items_per_sale_unit', 'sales_quantity_per_package',
-                 'asset_details', 'product_details', 'material_details']
+                 'preferred_vendor_name', 'purchasing_uom', 'items_per_purchase_unit',
+                 'purchase_quantity_per_package', 'sales_uom', 'items_per_sale_unit',
+                 'sales_quantity_per_package'] 
+                #  'asset_details', 'product_details', 'material_details']
         read_only_fields = ['item_id', 'asset_id', 'product_id', 'material_id', 'item_name', 'item_type',
-                 'unit_of_measure', 'item_status', 'manage_item_by']
-                 
+                          'unit_of_measure', 'item_status', 'manage_item_by']
     
     def update(self, instance, validated_data):
         # Ensure we don't try to modify the asset, product, or material relationships
-        # This will completely prevent changing those fields even if they're somehow sent
         validated_data.pop('asset', None)
         validated_data.pop('product', None)
         validated_data.pop('material', None)
+        
         return super().update(instance, validated_data)
     
     def to_representation(self, instance):
         ret = super().to_representation(instance)
+        
+        # For create/edit forms, remove these fields
+        if self.context.get('request') and self.context.get('request').method in ['POST', 'PUT', 'PATCH']:
+            ret.pop('asset_details', None)
+            ret.pop('product_details', None)
+            ret.pop('material_details', None)
+        
         return ret
 
 class PolicyChoiceSerializer(serializers.ModelSerializer):   

@@ -4,6 +4,7 @@ from .models import AuditLog
 from .serializers import AuditLogSerializer
 from rest_framework.decorators import action
 
+
 class AuditLogViewSet(viewsets.ModelViewSet):
     queryset = AuditLog.objects.all()
     serializer_class = AuditLogSerializer

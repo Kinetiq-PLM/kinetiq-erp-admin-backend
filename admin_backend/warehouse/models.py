@@ -10,7 +10,7 @@ class Warehouse(models.Model):
         return self.warehouse_location
     
     class Meta:
-        db_table = 'warehouse'
+        db_table = '"admin"."warehouse"'
         verbose_name = 'Warehouse'
         verbose_name_plural = 'Warehouses'
         managed = False

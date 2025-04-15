@@ -18,7 +18,7 @@ class VendorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vendor
         fields = ['vendor_code', 'application_reference', 'vendor_name', 'contact_person', 'status']
-        read_only_fields = ['vendor_code']
+        read_only_fields = ['vendor_code', 'application_reference']
     
     def create(self, validated_data):
         # Generate a unique vendor_code

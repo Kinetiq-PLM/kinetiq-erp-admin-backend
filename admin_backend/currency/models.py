@@ -12,7 +12,6 @@ class Currency(models.Model):
         return self.currency_name
     
     class Meta:
-        db_table = 'currency'
+        db_table = '"admin"."currency"'
         verbose_name = 'Currency'
         verbose_name_plural = 'Currencies'
-        managed = False

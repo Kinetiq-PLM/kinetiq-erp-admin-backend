@@ -1,21 +1,31 @@
 from django.db import models
-from django.utils import timezone
-from django import forms
 
 # Create your models here.
+
+class DocumentItems(models.Model):
+    content_id = models.CharField(max_length=255, primary_key=True) 
+
+    class Meta:
+        managed = False
+        db_table = '"operations"."document_items"'
+        
+    def __str__(self):
+        return self.content_id
+
+
 class Assets(models.Model):
     asset_id = models.CharField(primary_key=True, max_length=255)
     asset_name = models.CharField(max_length=255)
     purchase_date = models.DateField(blank=True, null=True)
     purchase_price = models.DecimalField(max_digits=65535, decimal_places=2)
     serial_no = models.CharField(max_length=225, blank=True, null=True)
-    content_id = models.CharField(max_length=255, blank=True, null=True)
+    content_id = models.ForeignKey(DocumentItems, on_delete=models.CASCADE, null=True, blank=True, to_field='content_id', db_column='content_id')
 
     def __str__(self):
         return self.asset_name
 
     class Meta:
-        db_table = 'assets'
+        db_table = '"admin"."assets"'
         verbose_name = 'Asset'
         verbose_name_plural = 'Assets'
         managed = False
@@ -42,7 +52,7 @@ class Policies(models.Model):
         return self.policy_name
 
     class Meta:
-        db_table = 'policies'
+        db_table = '"admin"."policies"'
         verbose_name = 'Policy'
         verbose_name_plural = 'Policies'
         managed = False
@@ -71,7 +81,7 @@ class Vendor(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'vendor'
+        db_table = '"admin"."vendor"'
     
 class Products(models.Model):
     KG = 'kg'
@@ -118,13 +128,13 @@ class Products(models.Model):
     item_status = models.CharField(max_length=20, choices=ITEM_STATUS_CHOICES, default=ACTIVE)
     warranty_period = models.IntegerField(blank=True, null=True)
     policy = models.ForeignKey(Policies, models.DO_NOTHING, blank=True, null=True, to_field='policy_id', db_column='policy_id')
-    content_id = models.CharField(max_length=255, blank=True, null=True)
+    content_id = models.ForeignKey(DocumentItems, on_delete=models.CASCADE, null=True, blank=True, to_field='content_id', db_column='content_id')
 
     def __str__(self):
         return self.product_name
 
     class Meta:
-        db_table = 'products'
+        db_table = '"admin"."products"'
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
         managed = False
@@ -165,7 +175,7 @@ class RawMaterials(models.Model):
         return self.material_name
 
     class Meta:
-        db_table = 'raw_materials'
+        db_table = '"admin"."raw_materials"'
         verbose_name = 'Raw Material'
         verbose_name_plural = 'Raw Materials'
         managed = False
@@ -246,37 +256,7 @@ class ItemMasterData(models.Model):
         return self.item_id
 
     class Meta:
-        db_table = 'item_master_data'
+        db_table = '"admin"."item_master_data"'
         verbose_name = 'Item Master Data'
         verbose_name_plural = 'Item Master Data'
         managed = False
-
-class ItemMasterDataForm(forms.ModelForm):
-    class Meta:
-        model = ItemMasterData
-        exclude = ['item_id', 'asset_id', 'product_id', 'material_id', 'item_name', 'item_type', 'unit_of_measure', 'item_status', 'manage_item_by']
-
-class AssetsForm(forms.ModelForm):
-    class Meta:
-        model = Assets
-        fields = ['asset_name', 'purchase_date', 'purchase_price', 'serial_no', 'content_id']
-        widgets = {
-            'purchase_date': forms.DateInput(attrs={'type': 'date'}),
-        }
-
-class ProductsForm(forms.ModelForm):
-    class Meta:
-        model = Products
-        fields = ['product_name', 'description', 'selling_price', 'stock_level', 'unit_of_measure', 
-                 'batch_no', 'item_status', 'warranty_period', 'policy', 'content_id']
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-        }
-
-class RawMaterialsForm(forms.ModelForm):
-    class Meta:
-        model = RawMaterials
-        fields = ['material_name', 'description', 'unit_of_measure', 'cost_per_unit', 'vendor_code']
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-        }

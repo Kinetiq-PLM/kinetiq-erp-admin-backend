@@ -1,29 +1,21 @@
+# user_manage/models.py
 from django.db import models
 from django.utils import timezone
-from django import forms
+
 
 # Create your models here.
 
-class RolePermission(models.Model):
-    FULL_ACCESS = 'Full Access'
-    VIEW_ONLY = 'Read-Only'
-    
-    ACCESS_LEVEL_CHOICES = [
-        (FULL_ACCESS, 'Full Access'),
-        (VIEW_ONLY, 'Read-Only'),
-    ]
-    
+class RolePermission(models.Model):  
     role_id = models.CharField(primary_key=True, max_length=255)    
     role_name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     permissions = models.TextField(null=True, blank=True)
-    access_level = models.CharField(max_length=20, choices=ACCESS_LEVEL_CHOICES, default=VIEW_ONLY)
     
     def __str__(self):
         return self.role_name
     
     class Meta:
-        db_table = 'roles_permission'
+        db_table = '"admin"."roles_permission"'
         verbose_name = 'Role & Permission'
         verbose_name_plural = 'Roles & Permissions'
         managed = False
@@ -62,17 +54,7 @@ class User(models.Model):
         return f"{self.first_name} {self.last_name}"
     
     class Meta:
-        db_table = 'users'
+        db_table = '"admin"."users"'
         verbose_name = 'User'
         verbose_name_plural = 'Users'
         managed = False
-
-class RolePermissionForm(forms.ModelForm):
-    class Meta:
-        model = RolePermission
-        exclude = ['role_id']
-
-class UserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        exclude = ['user_id', 'created_at', 'updated_at']

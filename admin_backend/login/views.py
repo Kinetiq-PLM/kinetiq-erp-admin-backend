@@ -1,4 +1,4 @@
-# admin/views.py
+# login/views.py
 from django.db import connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -36,7 +36,7 @@ class LoginView(APIView):
         # This approach works because the password is hashed using pgcrypto
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT * FROM users WHERE email = %s AND password = crypt(%s, password)",
+                "SELECT * FROM admin.users WHERE email = %s AND password = crypt(%s, password)",
                 [email, password]
             )
             row = cursor.fetchone()
@@ -78,7 +78,7 @@ class LoginView(APIView):
         if user_data.get('role_id'):
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT * FROM roles_permission WHERE role_id = %s",
+                    "SELECT * FROM admin.roles_permission WHERE role_id = %s",
                     [user_data['role_id']]
                 )
                 role_row = cursor.fetchone()

@@ -24,13 +24,12 @@ class BusinessPartnerMaster(models.Model):
         return self.partner_name
     
     class Meta:
-        db_table = 'business_partner_master'
+        db_table = '"admin"."business_partner_master"'
         verbose_name = 'Business Partner'
         verbose_name_plural = 'Business Partners'
         managed = False
 
 class Vendor(models.Model):
-
     ACTIVE = 'Active'
     INACTIVE = 'Inactive'
     BLOCKED = 'Blocked'
@@ -50,7 +49,7 @@ class Vendor(models.Model):
         return self.vendor_name
     
     class Meta:
-        db_table = 'vendor'
+        db_table = '"admin"."vendor"'
         verbose_name = 'Vendor'
         verbose_name_plural = 'Vendors'
         managed = False
