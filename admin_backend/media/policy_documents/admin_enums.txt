@@ -1,0 +1,88 @@
+ADMIN ENUMS
+
+💠business partner master
+
+category (partner_category)
+🔴Employee
+🔴Vendor
+🔴Customer
+
+💠users
+
+status (user_status)
+🔴Active
+🔴Inactive
+
+type (user_type)
+🔴Customer
+🔴Employee
+
+💠vendor
+
+status (user_status)
+🔴Active
+🔴Inactive
+
+💠item master data
+
+item_type 
+🔴Products
+🔴Raw Materials
+🔴Assets
+
+manage_item_by 
+🔴None
+🔴Serial Number
+🔴Batches
+
+unit_of_measure / sales_uom / purchasing_uom
+🔴kg
+🔴sh
+🔴bx
+🔴L
+🔴m
+🔴gal
+🔴pcs
+🔴set
+🔴mm
+🔴unit
+
+💠raw_materials
+
+unit_of_measure
+🔴kg
+🔴sh
+🔴bx
+🔴L
+🔴m
+🔴gal
+🔴pcs
+🔴set
+🔴mm
+🔴unit
+
+💠products
+
+unit_of_measure
+🔴kg
+🔴sh
+🔴bx
+🔴L
+🔴m
+🔴gal
+🔴pcs
+🔴set
+🔴mm
+🔴unit
+
+item_status
+🔴Active
+🔴Inactive
+🔴Blocked
+
+💠policies 
+
+status (user_status)
+🔴Active
+🔴Inactive
+

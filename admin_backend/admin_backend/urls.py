@@ -29,7 +29,7 @@ urlpatterns = [
     path('api/', include('audit_log.urls')),
     path('api/', include('warehouse.urls')),
     path('api/', include('currency.urls')),  
-]
+] 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

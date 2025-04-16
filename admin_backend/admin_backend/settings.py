@@ -28,10 +28,7 @@ SECRET_KEY = 'django-insecure-fr$c(xhti7b44ov4zikf^0*=h$lrxkk5*k&x@0g@28#s3618f9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["j24fs2pfwf.execute-api.ap-southeast-1.amazonaws.com", 
-                 "127.0.0.1",
-                    "localhost",
-                ]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "https://7lthyploub.execute-api.ap-southeast-1.amazonaws.com"]
 
 
 # Application definition
@@ -169,31 +166,22 @@ DATABASES = {
     }
 }
 
-import os
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'Kinetiq-DB'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'KntBg3jIY0DbpH8G9bwt'),
-        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-        'PORT': os.getenv('DB_PORT', '15432'),
-        # 'OPTIONS': {
-        #     'options': '-c search_path=admin,public'
-        # },
-    }
-}
+# import os
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME', 'Kinetiq-DB'),
+#         'USER': os.getenv('DB_USER', 'postgres'),
+#         'PASSWORD': os.getenv('DB_PASSWORD', 'KntBg3jIY0DbpH8G9bwt'),
+#         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+#         'PORT': os.getenv('DB_PORT', '15432'),
+#         # 'OPTIONS': {
+#         #     'options': '-c search_path=admin,public'
+#         # },
+#     }
+# }
 
-# Celery Configuration
-from celery.schedules import crontab
 
-CELERY_BEAT_SCHEDULE = {
-    'update-exchange-rates-daily': {
-        'task': 'currency.tasks.update_currency_exchange_rates',
-        'schedule': crontab(hour=0, minute=0),  # Run at midnight every day
-        # Alternatively: 'schedule': timedelta(days=1),
-    },
-}
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Default Redis port and db 0
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
@@ -202,7 +190,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC+08:00'  # Using your project's timezone setting
 
+# Celery Configuration
+from celery.schedules import crontab
 
+CELERY_BEAT_SCHEDULE = {
+    'update-exchange-rates-daily': {
+        'task': 'currency.tasks.update_exchange_rates_task',
+        'schedule': crontab(hour=0, minute=0),  # Run at midnight every day
+        # Alternatively: 'schedule': timedelta(days=1),
+    },
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 

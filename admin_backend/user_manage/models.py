@@ -23,7 +23,6 @@ class RolePermission(models.Model):
 class User(models.Model):
     ACTIVE = 'Active'
     INACTIVE = 'Inactive'
-    SUSPENDED = 'Suspended'
     
     STATUS_CHOICES = [
         (ACTIVE, 'Active'),

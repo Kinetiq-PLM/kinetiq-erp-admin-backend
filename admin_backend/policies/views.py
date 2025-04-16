@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 
 class PoliciesViewSet(viewsets.ModelViewSet):
-    queryset = Policies.objects.all()
+    queryset = Policies.objects.exclude(policy_name__startswith='ARCHIVED_')
     serializer_class = PoliciesSerializer
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     parser_classes = [JSONParser, MultiPartParser, FormParser]
@@ -62,12 +62,36 @@ class PoliciesViewSet(viewsets.ModelViewSet):
         )
 
     def perform_destroy(self, instance):
-        # Also delete any associated document
-        try:
-            PolicyDocument.objects.filter(policy_id=instance.policy_id).delete()
-        except Exception:
-            pass
-        instance.delete()
+        # Instead of deleting, prefix the policy name with 'ARCHIVED_'
+        if not instance.policy_name.startswith('ARCHIVED_'):
+            instance.policy_name = f'ARCHIVED_{instance.policy_name}'
+            instance.save()
+        # Note: We don't delete the associated document
+
+    @action(detail=False, methods=['get'])
+    def archived(self, request):
+        archived_policies = Policies.objects.filter(policy_name__startswith='ARCHIVED_')
+        page = self.paginate_queryset(archived_policies)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(archived_policies, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['patch'])
+    def restore(self, request, pk=None):
+        from django.shortcuts import get_object_or_404
+        
+        # Get the policy directly from the database, bypassing the filtered queryset
+        policy_id = pk
+        policy = get_object_or_404(Policies, policy_id=policy_id)
+        
+        if policy.policy_name.startswith('ARCHIVED_'):
+            policy.policy_name = policy.policy_name[9:]  # Remove "ARCHIVED_" prefix
+            policy.save()
+        
+        serializer = self.get_serializer(policy)
+        return Response(serializer.data)
 
     def debug_file_path(request, filename):
         try:
