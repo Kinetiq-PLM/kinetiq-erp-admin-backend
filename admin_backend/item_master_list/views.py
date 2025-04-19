@@ -17,7 +17,7 @@ class AssetsViewSet(viewsets.ModelViewSet):
     
     # Add built-in search and ordering filters
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['asset_id', 'asset_name', 'purchase_date', 'purchase_price', 'serial_no', 'content_id']
+    search_fields = ['asset_id', 'asset_name', 'purchase_date', 'purchase_price']
     ordering_fields = ['asset_id', 'asset_name', 'purchase_date', 'purchase_price', 'serial_no', 'content_id']
     ordering = ['purchase_date']  # Default ordering
     
@@ -88,8 +88,7 @@ class ProductsViewSet(viewsets.ModelViewSet):
     
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['product_id', 'product_name', 'description', 'selling_price', 'stock_level', 
-                 'unit_of_measure', 'batch_no', 'item_status', 'warranty_period', 'policy_id', 
-                 'policy_name', 'policy_details', 'content_id']
+                 'unit_of_measure', 'batch_no', 'item_status', 'warranty_period']
     ordering_fields = ['product_id', 'product_name', 'description', 'selling_price', 'stock_level', 
                  'unit_of_measure', 'batch_no', 'item_status', 'warranty_period', 'policy_id', 
                  'policy_name', 'policy_details', 'content_id']
@@ -140,7 +139,7 @@ class RawMaterialsViewSet(viewsets.ModelViewSet):
     
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['material_id', 'material_name', 'description', 'unit_of_measure', 
-                 'cost_per_unit', 'vendor_id', 'vendor_name', 'vendor_details']
+                 'cost_per_unit']
     ordering_fields = ['material_id', 'material_name', 'description', 'unit_of_measure', 
                  'cost_per_unit', 'vendor_id', 'vendor_name', 'vendor_details']
     ordering = ['material_name']  # Default ordering
@@ -189,11 +188,10 @@ class ItemMasterDataViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'put', 'patch', 'delete']
     
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['item_id', 'asset_id', 'product_id', 'material_id', 'item_name', 'item_type',
-                 'unit_of_measure', 'item_status', 'manage_item_by', 'preferred_vendor',
-                 'preferred_vendor_name', 'purchasing_uom', 'items_per_purchase_unit',
-                 'purchase_quantity_per_package', 'sales_uom', 'items_per_sale_unit',
-                 'sales_quantity_per_package']
+    search_fields = ['item_id', 'item_name', 'item_type',
+                     'unit_of_measure', 'item_status', 'manage_item_by', 'preferred_vendor',
+                     'items_per_purchase_unit', 'purchase_quantity_per_package', 'sales_uom',
+                     'items_per_sale_unit', 'sales_quantity_per_package']
     ordering_fields = ['item_id', 'asset_id', 'product_id', 'material_id', 'item_name', 'item_type',
                  'unit_of_measure', 'item_status', 'manage_item_by', 'preferred_vendor',
                  'preferred_vendor_name', 'purchasing_uom', 'items_per_purchase_unit',
