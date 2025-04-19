@@ -1,3 +1,4 @@
+# item_master_list/views.py
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -16,9 +17,9 @@ class AssetsViewSet(viewsets.ModelViewSet):
     
     # Add built-in search and ordering filters
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['asset_id', 'asset_name', 'serial_no']
-    ordering_fields = ['asset_name', 'purchase_date', 'purchase_price']
-    ordering = ['asset_name']  # Default ordering
+    search_fields = ['asset_id', 'asset_name', 'purchase_date', 'purchase_price', 'serial_no', 'content_id']
+    ordering_fields = ['asset_id', 'asset_name', 'purchase_date', 'purchase_price', 'serial_no', 'content_id']
+    ordering = ['purchase_date']  # Default ordering
     
     def perform_create(self, serializer):
         serializer.save()
@@ -34,10 +35,16 @@ class AssetsViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def archived(self, request):
         archived_assets = Assets.objects.filter(asset_name__startswith='ARCHIVED_')
+        
+        # Apply filter backends manually
+        for backend in list(self.filter_backends):
+            archived_assets = backend().filter_queryset(self.request, archived_assets, self)
+        
         page = self.paginate_queryset(archived_assets)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
+        
         serializer = self.get_serializer(archived_assets, many=True)
         return Response(serializer.data)
     
@@ -80,8 +87,12 @@ class ProductsViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['product_id', 'product_name', 'description', 'batch_no']
-    ordering_fields = ['product_name', 'selling_price', 'stock_level', 'item_status']
+    search_fields = ['product_id', 'product_name', 'description', 'selling_price', 'stock_level', 
+                 'unit_of_measure', 'batch_no', 'item_status', 'warranty_period', 'policy_id', 
+                 'policy_name', 'policy_details', 'content_id']
+    ordering_fields = ['product_id', 'product_name', 'description', 'selling_price', 'stock_level', 
+                 'unit_of_measure', 'batch_no', 'item_status', 'warranty_period', 'policy_id', 
+                 'policy_name', 'policy_details', 'content_id']
     ordering = ['product_name']  # Default ordering
 
     def perform_create(self, serializer):
@@ -99,6 +110,11 @@ class ProductsViewSet(viewsets.ModelViewSet):
     def archived(self, request):
         archived_products = Products.objects.filter(product_name__startswith='ARCHIVED_')
         page = self.paginate_queryset(archived_products)
+
+        # Apply filter backends manually
+        for backend in list(self.filter_backends):
+            archived_products = backend().filter_queryset(self.request, archived_products, self)
+
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
@@ -123,8 +139,10 @@ class RawMaterialsViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['material_id', 'material_name', 'description']
-    ordering_fields = ['material_name', 'cost_per_unit', 'unit_of_measure']
+    search_fields = ['material_id', 'material_name', 'description', 'unit_of_measure', 
+                 'cost_per_unit', 'vendor_id', 'vendor_name', 'vendor_details']
+    ordering_fields = ['material_id', 'material_name', 'description', 'unit_of_measure', 
+                 'cost_per_unit', 'vendor_id', 'vendor_name', 'vendor_details']
     ordering = ['material_name']  # Default ordering
 
     def perform_create(self, serializer):
@@ -142,6 +160,11 @@ class RawMaterialsViewSet(viewsets.ModelViewSet):
     def archived(self, request):
         archived_materials = RawMaterials.objects.filter(material_name__startswith='ARCHIVED_')
         page = self.paginate_queryset(archived_materials)
+        
+        # Apply filter backends manually    
+        for backend in list(self.filter_backends):
+            archived_materials = backend().filter_queryset(self.request, archived_materials, self)
+        
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
@@ -166,8 +189,16 @@ class ItemMasterDataViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'put', 'patch', 'delete']
     
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['item_id', 'item_name', 'item_type', 'preferred_vendor']
-    ordering_fields = ['item_name', 'item_type', 'item_status', 'manage_item_by']
+    search_fields = ['item_id', 'asset_id', 'product_id', 'material_id', 'item_name', 'item_type',
+                 'unit_of_measure', 'item_status', 'manage_item_by', 'preferred_vendor',
+                 'preferred_vendor_name', 'purchasing_uom', 'items_per_purchase_unit',
+                 'purchase_quantity_per_package', 'sales_uom', 'items_per_sale_unit',
+                 'sales_quantity_per_package']
+    ordering_fields = ['item_id', 'asset_id', 'product_id', 'material_id', 'item_name', 'item_type',
+                 'unit_of_measure', 'item_status', 'manage_item_by', 'preferred_vendor',
+                 'preferred_vendor_name', 'purchasing_uom', 'items_per_purchase_unit',
+                 'purchase_quantity_per_package', 'sales_uom', 'items_per_sale_unit',
+                 'sales_quantity_per_package']
     ordering = ['item_name']  # Default ordering
     
     
@@ -183,6 +214,11 @@ class ItemMasterDataViewSet(viewsets.ModelViewSet):
     def archived(self, request):
         archived_items = ItemMasterData.objects.filter(item_name__startswith='ARCHIVED_')
         page = self.paginate_queryset(archived_items)
+
+        # Apply filter backends manually
+        for backend in list(self.filter_backends):
+            archived_items = backend().filter_queryset(self.request, archived_items, self)
+
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)

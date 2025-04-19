@@ -1,9 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 import uuid
 
 class AuditLog(models.Model):
     log_id = models.CharField(primary_key=True, max_length=255)
-    user_id = models.CharField(max_length=255, null=True, blank=True)
+    user = models.ForeignKey(User, models.DO_NOTHING, blank=True, null=True)
     action = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     ip_address = models.CharField(max_length=255, null=True, blank=True)

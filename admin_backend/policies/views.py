@@ -1,4 +1,4 @@
-# views.py
+# policies/views.py
 import os
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response

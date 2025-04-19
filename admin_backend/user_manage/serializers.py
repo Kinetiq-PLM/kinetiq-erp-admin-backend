@@ -8,19 +8,24 @@ class RolePermissionSerializer(serializers.ModelSerializer):
         choices=[
             ('Accounting', 'Accounting'),
             ('Administration', 'Administration'),
+	        ('CRM', 'CRM'),
             ('Distribution', 'Distribution'),
             ('Finance', 'Finance'),
             ('Human Resources', 'Human Resources'),
             ('Inventory', 'Inventory'),
+	        ('Job Posting', 'Job Posting'),
             ('Management', 'Management'),
             ('MRP', 'MRP'),
             ('Operations', 'Operations'),
             ('Production', 'Production'),
             ('Project Management', 'Project Management'),
+	        ('Project Request', 'Project Request'),
+	        ('Purchase Request', 'Purchase Request'),
             ('Purchasing', 'Purchasing'),
             ('Sales', 'Sales'),
-            ('Services', 'Services'),
-            ('Solution Customizing', 'Solution Customizing'),
+            ('Support & Services', 'Support & Services'),
+            ('Report Generator', 'Report Generator'),
+	        ('Workforce Request', 'Workforce Request'),
         ],
         required=False
     )
@@ -127,6 +132,7 @@ class UserSerializer(serializers.ModelSerializer):
         
         # For update: Since there's no trigger for update password hashing,
         # we need to explicitly call the hash_user_passwords function
+
         updated_instance = super().update(instance, validated_data)
         
         # If password was updated, call the hash function

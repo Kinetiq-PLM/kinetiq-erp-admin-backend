@@ -13,9 +13,9 @@ class UserViewSet(viewsets.ModelViewSet):
     
     # Add built-in search and ordering filters
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['user_id', 'first_name', 'last_name', 'email', 'employee_id']
-    ordering_fields = ['created_at', 'first_name', 'last_name', 'email', 'status', 'type']
-    ordering = ['first_name']  # Default ordering
+    search_fields = ['user_id', 'first_name', 'last_name', 'email', 'employee_id', 'role__role_name', 'status', 'created_at', 'updated_at']
+    ordering_fields = ['user_id', 'first_name', 'last_name', 'email', 'employee_id', 'role__role_name', 'status', 'created_at', 'updated_at']
+    ordering = ['-updated_at']  # Default ordering
     
     def perform_create(self, serializer):
         serializer.save()
@@ -29,8 +29,8 @@ class RolePermissionViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'patch', 'delete']
 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['role_name', 'description']
-    ordering_fields = ['role_name', 'permissions']
+    search_fields = ['role_id', 'role_name', 'description', 'permissions']
+    ordering_fields = ['role_name', 'permissions', 'description', 'role_id', 'permissions']
     ordering = ['role_name']  # Default ordering
 
     
@@ -52,10 +52,16 @@ class RolePermissionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def archived(self, request):
         archived_roles = RolePermission.objects.filter(role_name__startswith='ARCHIVED_')
+
+        # Apply filter backends manually
+        for backend in list(self.filter_backends):
+            archived_roles = backend().filter_queryset(self.request, archived_roles, self)
+
         page = self.paginate_queryset(archived_roles)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(archived_roles, many=True)
         return Response(serializer.data)
     

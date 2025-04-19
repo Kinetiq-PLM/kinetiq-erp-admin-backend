@@ -46,8 +46,8 @@ class User(models.Model):
     role = models.ForeignKey(RolePermission, on_delete=models.SET_NULL, null=True, blank=True, to_field='role_id', db_column='role_id')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ACTIVE)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=EMPLOYEE)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

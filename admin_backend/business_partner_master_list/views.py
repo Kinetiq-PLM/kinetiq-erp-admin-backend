@@ -14,12 +14,6 @@ class BusinessPartnerMasterViewSet(viewsets.ModelViewSet):
     search_fields = ['partner_id', 'employee_id', 'vendor_code__vendor_name', 'customer_id', 'partner_name']
     ordering_fields = ['partner_id', 'employee_id', 'vendor_code__vendor_name', 'customer_id', 'partner_name']
     ordering = ['partner_name']  # Default ordering
-                
-    def perform_update(self, serializer):
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        instance.delete()
 
 class VendorViewSet(viewsets.ModelViewSet):
     queryset = Vendor.objects.all()
@@ -31,9 +25,3 @@ class VendorViewSet(viewsets.ModelViewSet):
     search_fields = ['vendor_code', 'application_reference', 'vendor_name', 'contact_person']
     ordering_fields = ['vendor_code', 'application_reference', 'vendor_name', 'contact_person']
     ordering = ['vendor_name']  # Default ordering
-    
-    def perform_update(self, serializer):
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        instance.delete()
