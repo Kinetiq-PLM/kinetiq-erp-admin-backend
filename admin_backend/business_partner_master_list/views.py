@@ -11,8 +11,8 @@ class BusinessPartnerMasterViewSet(viewsets.ModelViewSet):
     
     # Add built-in search and ordering filters
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['partner_id', 'employee_id', 'vendor_code__vendor_name', 'customer_id', 'partner_name']
-    ordering_fields = ['partner_id', 'employee_id', 'vendor_code__vendor_name', 'customer_id', 'partner_name']
+    search_fields = ['partner_id', 'employee_id', 'category', 'vendor_code__vendor_name', 'customer_id', 'partner_name']
+    ordering_fields = ['partner_id', 'employee_id', 'category', 'vendor_code__vendor_name', 'customer_id', 'partner_name']
     ordering = ['partner_name']  # Default ordering
 
 class VendorViewSet(viewsets.ModelViewSet):
@@ -23,5 +23,5 @@ class VendorViewSet(viewsets.ModelViewSet):
     # Add built-in search and ordering filters
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['vendor_code', 'application_reference', 'vendor_name', 'contact_person']
-    ordering_fields = ['vendor_code', 'application_reference', 'vendor_name', 'contact_person']
+    ordering_fields = ['vendor_code', 'application_reference', 'vendor_name', 'contact_person', 'status']
     ordering = ['vendor_name']  # Default ordering

@@ -12,6 +12,6 @@ class AuditLogViewSet(viewsets.ModelViewSet):
     
     # Add built-in search and ordering filters
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['log_id', 'user_id', 'action', 'ip_address']
-    ordering_fields = ['timestamp']
+    search_fields = ['log_id', 'action', 'ip_address', 'timestamp']
+    ordering_fields = ['timestamp', 'log_id', 'user_id', 'action', 'ip_address']
     ordering = ['-timestamp']  # Default ordering by timestamp descending

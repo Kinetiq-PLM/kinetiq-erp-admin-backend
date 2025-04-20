@@ -2,7 +2,7 @@
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import Assets, Policies, Vendor, Products, RawMaterials, ItemMasterData
+from .models import Assets, Policies, Vendor, Products, RawMaterials, ItemMasterData, DocumentItems
 from .serializers import (
     AssetsSerializer, PoliciesSerializer, VendorSerializer,
     ProductsSerializer, RawMaterialsSerializer, ItemMasterDataSerializer,
@@ -47,6 +47,11 @@ class AssetsViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(archived_assets, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def content_ids(self, request):
+        content_ids = DocumentItems.objects.all().values_list('content_id', flat=True)
+        return Response(content_ids)
     
     @action(detail=True, methods=['patch'])
     def restore(self, request, pk=None):    
@@ -104,6 +109,11 @@ class ProductsViewSet(viewsets.ModelViewSet):
         if not instance.product_name.startswith('ARCHIVED_'):
             instance.product_name = f'ARCHIVED_{instance.product_name}'
             instance.save()
+
+    @action(detail=False, methods=['get'])
+    def policy_id(self, request):
+        policy_id = Policies.objects.all().values_list('policy_id', flat=True)
+        return Response(Policies)
     
     @action(detail=False, methods=['get'])
     def archived(self, request):
