@@ -2,6 +2,20 @@ from django.db import models
 from django.utils import timezone
 from django import forms
 
+class Vendor(models.Model):
+
+    vendor_code = models.CharField(primary_key=True, max_length=255)
+    company_name = models.CharField(max_length=255)
+    status = models.CharField(max_length=20, default='Approved')
+
+
+    def __str__(self):
+        return self.company_name
+
+    class Meta:
+        managed = False
+        db_table = '"purchasing"."vendors"'
+
 class BusinessPartnerMaster(models.Model):
     EMPLOYEE = 'Employee'
     VENDOR = 'Vendor'
@@ -13,9 +27,6 @@ class BusinessPartnerMaster(models.Model):
 
 
     partner_id = models.CharField(primary_key=True, max_length=255)
-    employee_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    vendor_code = models.OneToOneField('Vendor', models.DO_NOTHING, db_column='vendor_code', blank=True, null=True)
-    customer_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
     partner_name = models.CharField(max_length=255)
     category = models.CharField(max_length=20, choices=CATEGORY)
     contact_info = models.CharField(max_length=255, blank=True, null=True)
@@ -28,38 +39,3 @@ class BusinessPartnerMaster(models.Model):
         verbose_name = 'Business Partner'
         verbose_name_plural = 'Business Partners'
         managed = False
-
-class Vendor(models.Model):
-    ACTIVE = 'Active'
-    INACTIVE = 'Inactive'
-    BLOCKED = 'Blocked'
-
-    STATUS_CHOICES = [
-        (ACTIVE, 'Active'),
-        (INACTIVE, 'Inactive'),
-        (BLOCKED, 'Blocked')
-    ]
-    vendor_code = models.CharField(primary_key=True, max_length=255)
-    application_reference = models.CharField(max_length=255, blank=True, null=True)
-    vendor_name = models.CharField(max_length=255)
-    contact_person = models.CharField(max_length=255, blank=True, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=ACTIVE)
-
-    def __str__(self):
-        return self.vendor_name
-    
-    class Meta:
-        db_table = '"admin"."vendor"'
-        verbose_name = 'Vendor'
-        verbose_name_plural = 'Vendors'
-        managed = False
-
-class BusinessPartnerMasterForm(forms.ModelForm):
-    class Meta:
-        model = BusinessPartnerMaster
-        fields = ['partner_id', 'employee_id', 'vendor_code', 'customer_id', 'partner_name', 'category', 'contact_info']
-
-class VendorForm(forms.ModelForm):
-    class Meta:
-        model = Vendor
-        fields = ['vendor_code', 'application_reference', 'vendor_name', 'contact_person', 'status']

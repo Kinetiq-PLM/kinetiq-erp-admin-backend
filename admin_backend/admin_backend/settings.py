@@ -26,12 +26,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fr$c(xhti7b44ov4zikf^0*=h$lrxkk5*k&x@0g@28#s3618f9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1", 
-                 "localhost", 
-                 "7lthyploub.execute-api.ap-southeast-1.amazonaws.com"]
+# ALLOWED_HOSTS = ["127.0.0.1", 
+#                  "localhost", 
+#                  "7lthyploub.execute-api.ap-southeast-1.amazonaws.com"]
 
+ALLOWED_HOSTS = ["7lthyploub.execute-api.ap-southeast-1.amazonaws.com"]
+
+AWS_STORAGE_BUCKET_NAME = 'your-bucket-name'  # Replace with your actual bucket name
+AWS_REGION = 'ap-southeast-1'  # This matches the region in your API URL
 
 # Application definition
 
@@ -57,6 +61,7 @@ INSTALLED_APPS = [
     "warehouse",
     "policies",
     "currency",
+    "notifications",
 
     'django_celery_beat',  # For scheduling tasks
 ]
@@ -81,9 +86,12 @@ MIDDLEWARE = [
 #     "http://localhost:8000",  # Adjust this React apps URL
 # ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = ["https://d2dhcd346f3g6s.cloudfront.net", "http://kinetiq-shell-app.s3-website-ap-southeast-1.amazonaws.com"]
 
 CORS_ALLOW_CREDENTIALS = True
+
 
 # REST_FRAMEWORK = {
 #     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -155,34 +163,34 @@ WSGI_APPLICATION = 'admin_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Kinetiq-DB-Schema',
-        'USER': 'postgres',
-        'PASSWORD': 'admindatabase',
-        'HOST': 'localhost',
-        'PORT': '5432',       # default PostgreSQL port
-        # 'OPTIONS': {
-        #     'options': '-c search_path=admin,public'
-        # },
-    }
-}
-
-# import os
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DB_NAME', 'Kinetiq-DB'),
-#         'USER': os.getenv('DB_USER', 'postgres'),
-#         'PASSWORD': os.getenv('DB_PASSWORD', 'KntBg3jIY0DbpH8G9bwt'),
-#         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
-#         'PORT': os.getenv('DB_PORT', '15432'),
+#         'NAME': 'Kinetiq-DB-Schema',
+#         'USER': 'postgres',
+#         'PASSWORD': 'admindatabase',
+#         'HOST': 'localhost',
+#         'PORT': '5432',       # default PostgreSQL port
 #         # 'OPTIONS': {
 #         #     'options': '-c search_path=admin,public'
 #         # },
 #     }
 # }
+
+import os
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'Kinetiq-DB'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'KntBg3jIY0DbpH8G9bwt'),
+        'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+        'PORT': os.getenv('DB_PORT', '15432'),
+        # 'OPTIONS': {
+        #     'options': '-c search_path=admin,public'
+        # },
+    }
+}
 
 
 

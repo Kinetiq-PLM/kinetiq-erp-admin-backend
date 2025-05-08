@@ -11,4 +11,4 @@ class RolePermissionAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'first_name', 'last_name', 'email', 'role', 'status', 'type')
+    list_display = ('user_id', 'first_name', 'last_name', 'email', 'role', 'status')

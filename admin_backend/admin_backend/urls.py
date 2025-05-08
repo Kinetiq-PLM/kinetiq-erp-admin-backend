@@ -20,7 +20,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('api/', include('login.urls')),
     path('api/', include('user_manage.urls')),
     path('api/', include('item_master_list.urls')),
@@ -28,7 +27,8 @@ urlpatterns = [
     path('api/', include('policies.urls')),
     path('api/', include('audit_log.urls')),
     path('api/', include('warehouse.urls')),
-    path('api/', include('currency.urls')),  
+    path('api/', include('currency.urls')),
+    path('api/', include('notifications.urls')),
 ] 
 
 if settings.DEBUG:

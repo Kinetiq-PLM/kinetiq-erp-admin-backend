@@ -20,24 +20,15 @@ class CurrencyViewSet(viewsets.ReadOnlyModelViewSet):
     http_method_names = ['get', 'post', 'patch']
 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['currency_id', 'currency_name', 'exchange_rate']
+    ordering_fields = ['currency_id', 'currency_name', 'exchange_rate']
+    ordering = ['currency_name']
     
-    # Cache currency list for 1 hour to improve performance
-    @method_decorator(cache_page(60 * 60))
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
     
     # Allow filtering active currencies
     def get_queryset(self):
         queryset = Currency.objects.all().order_by('currency_name')
         
-        # Filter by active status if requested
-        is_active = self.request.query_params.get('is_active', None)
-        if is_active is not None:
-            if is_active.lower() in ['true', '1', 'yes']:
-                queryset = queryset.filter(is_active=Currency.ACTIVE)
-            elif is_active.lower() in ['false', '0', 'no']:
-                queryset = queryset.filter(is_active=Currency.INACTIVE)
-                
         return queryset
     
     @action(detail=False, methods=['post', 'get'], permission_classes=[AllowAny])
